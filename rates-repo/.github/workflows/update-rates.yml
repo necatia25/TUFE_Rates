@@ -1,0 +1,44 @@
+name: Update TÜFE rates
+
+# TÜİK publishes on the 3rd. We run on the 4th, and again on the 6th in case
+# the first attempt failed. Repeat runs are harmless — if nothing changed,
+# nothing is committed.
+on:
+  schedule:
+    - cron: '0 9 4 * *'
+    - cron: '0 9 6 * *'
+  workflow_dispatch:        # manual trigger from the Actions tab
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install requests pandas
+
+      - name: Fetch rates from EVDS
+        env:
+          EVDS_API_KEY: ${{ secrets.EVDS_API_KEY }}
+        run: python fetch_tufe.py --yes
+
+      # The script exits non-zero if its sanity checks fail, so a bad figure
+      # never reaches this step: the workflow goes red and GitHub emails you.
+      - name: Commit if changed
+        run: |
+          git config user.name  "rates-bot"
+          git config user.email "actions@github.com"
+          if git diff --quiet rates.json; then
+            echo "No change this month."
+          else
+            git add rates.json
+            git commit -m "TÜFE rates $(date +%Y-%m)"
+            git push
+          fi
