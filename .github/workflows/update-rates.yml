@@ -5,8 +5,7 @@ name: Update TÜFE rates
 # nothing is committed.
 on:
   schedule:
-    - cron: '0 9 4 * *'
-    - cron: '0 9 6 * *'
+    - cron: '0 9 * * *'
   workflow_dispatch:        # manual trigger from the Actions tab
 
 jobs:
