@@ -49,7 +49,7 @@ SERIES_CODE = "TP.TUKFIY2025.GENEL"     # raw index, no formula suffix
 ENDPOINT = "https://evds3.tcmb.gov.tr/igmevdsms-dis"
 START_YEAR = 2020
 RENEWAL_OFFSET_MONTHS = 1
-OUT_PATH = Path(__file__).parent.parent / "assets" / "rates.json"
+OUT_PATH = Path(__file__).parent / "rates.json"
 
 # Sanity bounds for automated runs — tuned to catch a broken series or a
 # parsing bug, not to second-guess reality.
