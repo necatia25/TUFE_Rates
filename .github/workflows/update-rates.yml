@@ -1,12 +1,16 @@
 name: Update TÜFE rates
 
-# TÜİK publishes on the 3rd. We run on the 4th, and again on the 6th in case
-# the first attempt failed. Repeat runs are harmless — if nothing changed,
-# nothing is committed.
+# TÜİK's publication date drifts — usually the 3rd, sometimes later. Rather
+# than guess, check every day. The script commits only when rates.json
+# actually changes, so most runs exit having done nothing. Actions minutes
+# are free on public repos, so daily costs nothing but picks up a new rate
+# within 24h of publication whenever it lands.
+#
+# 09:00 UTC = 12:00 Türkiye, safely after TÜİK's morning release.
 on:
   schedule:
     - cron: '0 9 * * *'
-  workflow_dispatch:        # manual trigger from the Actions tab
+  workflow_dispatch:
 
 jobs:
   update:
@@ -35,9 +39,9 @@ jobs:
           git config user.name  "rates-bot"
           git config user.email "actions@github.com"
           if git diff --quiet rates.json; then
-            echo "No change this month."
+            echo "No change today."
           else
             git add rates.json
-            git commit -m "TÜFE rates $(date +%Y-%m)"
+            git commit -m "TÜFE rates $(date +%Y-%m-%d)"
             git push
           fi
